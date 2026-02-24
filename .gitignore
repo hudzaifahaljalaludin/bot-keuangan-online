@@ -1,0 +1,9 @@
+# Google Service Account
+*.json
+
+# Python
+__pycache__/
+*.pyc
+
+# Excel temp
+~$*.xlsx
