@@ -8,15 +8,19 @@ import asyncio
 TOKEN = "8327665650:AAEbWNtT6nL7FoIbiZVt-ZXqhzN2Wo8Z81I"
 OWNER_ID = 8178584693
 SPREADSHEET_NAME = "KeuanganBot"
-JSON_FILE = "bot-keuangan-488317-2ff869c45041.json"
+import os
+import json
+from google.oauth2.service_account import Credentials
 
 scope = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
 ]
-creds = Credentials.from_service_account_file(JSON_FILE, scopes=scope)
-client = gspread.authorize(creds)
-sheet = client.open(SPREADSHEET_NAME).sheet1
+
+google_credentials = os.getenv("GOOGLE_CREDENTIALS")
+
+creds_dict = json.loads(google_credentials)
+creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
 
 
 def simpan_data(jenis, nominal, ket):
