@@ -21,6 +21,9 @@ google_credentials = os.getenv("GOOGLE_CREDENTIALS")
 creds_dict = json.loads(google_credentials)
 creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
 
+client = gspread.authorize(creds)
+sheet = client.open(SPREADSHEET_NAME).sheet1
+
 
 def simpan_data(jenis, nominal, ket):
     tanggal = datetime.now().strftime("%d-%m-%Y %H:%M")
