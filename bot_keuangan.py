@@ -4,13 +4,12 @@ from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 import asyncio
+import os
+import json
 
 TOKEN = "8327665650:AAEbWNtT6nL7FoIbiZVt-ZXqhzN2Wo8Z81I"
 OWNER_ID = 8178584693
 SPREADSHEET_NAME = "KeuanganBot"
-import os
-import json
-from google.oauth2.service_account import Credentials
 
 scope = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -25,6 +24,14 @@ creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
 
 def simpan_data(jenis, nominal, ket):
     tanggal = datetime.now().strftime("%d-%m-%Y %H:%M")
+
+    # authorize
+    client = gspread.authorize(creds)
+
+    # buka spreadsheet
+    sheet = client.open(SPREADSHEET_NAME).sheet1
+
+    # simpan data
     sheet.append_row([tanggal, jenis, nominal, ket])
 
 
