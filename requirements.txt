@@ -1,8 +1,4 @@
-python-telegram-bot
-pandas
-openpyxl
-google-api-python-client
-google-auth
-google-auth-oauthlib
-google-auth-httplib2
+python-telegram-bot==20.7
 gspread
+google-auth
+asyncio
