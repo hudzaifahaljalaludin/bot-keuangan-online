@@ -35,7 +35,7 @@ def simpan_data(jenis, nominal, ket):
     sheet = client.open(SPREADSHEET_NAME).sheet1
 
     # simpan data
-    sheet.append_row([tanggal, jenis, nominal, ket])
+    sheet.append_row([tanggal, jenis.capitalize(), nominal, ket])
 
 
 async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -71,6 +71,78 @@ async def handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text("Gunakan: masuk atau keluar")
 
+        # ========================
+# FUNCTION HITUNG SALDO
+# ========================
+def hitung_saldo():
+    client = gspread.authorize(creds)
+    sheet = client.open(SPREADSHEET_NAME).sheet1
+
+    data = sheet.get_all_values()
+
+    total_masuk = 0
+    total_keluar = 0
+
+    for row in data[1:]:  # skip header
+        if len(row) < 3:
+            continue
+
+        jenis = row[1].lower()
+        nominal = int(row[2])
+
+        if jenis == "masuk":
+            total_masuk += nominal
+        elif jenis == "keluar":
+            total_keluar += nominal
+
+    return total_masuk - total_keluar
+
+
+# ========================
+# HANDLE TRANSAKSI
+# ========================
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    text = update.message.text.lower()
+    parts = text.split()
+
+    if len(parts) < 3:
+        return
+
+    jenis = parts[0]
+    nominal = parts[1]
+    ket = " ".join(parts[2:])
+
+    if jenis not in ["masuk", "keluar"]:
+        return
+
+    if not nominal.isdigit():
+        await update.message.reply_text("Nominal harus angka!")
+        return
+
+    simpan_data(jenis, int(nominal), ket)
+
+    await update.message.reply_text("✅ Transaksi dicatat!")
+
+
+# ========================
+# COMMAND /SALDO
+# ========================
+async def cek_saldo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if update.effective_user.id != OWNER_ID:
+        return
+
+    saldo = hitung_saldo()
+
+    await update.message.reply_text(
+        f"💰 Saldo kamu sekarang:\nRp {saldo:,}"
+    )
+
+
 
 async def main():
     app = ApplicationBuilder().token(TOKEN).build()
@@ -84,3 +156,15 @@ if __name__ == "__main__":
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle))
     print("Bot aktif (Google Sheets)...")
     app.run_polling()
+
+    # ========================
+# MAIN
+# ========================
+app = ApplicationBuilder().token(TOKEN).build()
+
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+app.add_handler(CommandHandler("saldo", cek_saldo))
+
+print("Bot aktif (Google Sheets)...")
+
+app.run_polling()
