@@ -7,7 +7,7 @@ import os
 import json
 
 TOKEN = os.getenv("8327665650:AAEbWNtT6nL7FoIbiZVt-ZXqhzN2Wo8Z81I")
-OWNER_ID = int(os.getenv("8178584693"))
+OWNER_ID = int(os.getenv("OWNER_ID"))
 SPREADSHEET_NAME = "KeuanganBot"
 
 scope = [
